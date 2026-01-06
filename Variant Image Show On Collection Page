@@ -1,1 +1,156 @@
 
+{% for product in collection.products %}
+
+  {%- assign color_option = nil -%}
+
+  {%- for option in product.options_with_values -%}
+    {%- if option.name | downcase contains 'color' -%}
+      {%- assign color_option = option -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if color_option == nil %}
+    {% continue %}
+  {% endif %}
+
+  {%- for color_value in color_option.values -%}
+
+    {%- assign color_variant = nil -%}
+
+    {%- for variant in product.variants -%}
+      {%- if variant.options contains color_value -%}
+        {%- assign color_variant = variant -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {% if color_variant == nil %}
+      {% continue %}
+    {% endif %}
+
+    {% assign image = color_variant.featured_image | default: product.featured_image %}
+
+    <div class="grid__item">
+      <a href="{{ color_variant.url }}" class="variant-card">
+
+        <div class="variant-card__image">
+          <img
+            src="{{ image | image_url: width: 600 }}"
+            alt="{{ product.title }} – {{ color_value }}"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="variant-card__content">
+          <h3 class="variant-card__title">
+            {{ product.title }} – {{ color_value }}
+          </h3>
+
+          <p class="variant-card__price">
+            {{ color_variant.price | money }}
+          </p>
+        </div>
+
+      </a>
+    </div>
+
+  {%- endfor -%}
+
+{% endfor %}
+
+
+{%- assign gallery_images = color_variant.metafields.custom.color_gallery -%}
+
+{% if gallery_images != blank %}
+
+  {% for image in gallery_images %}
+    <div class="slider__slide">
+      <img
+        src="{{ image | image_url: width: 800 }}"
+        alt="{{ product.title }} – {{ color_value }}"
+        loading="lazy"
+      >
+    </div>
+  {% endfor %}
+
+{% else %}
+
+  {%- assign image = color_variant.featured_image | default: product.featured_image -%}
+
+  <div class="slider__slide">
+    <img
+      src="{{ image | image_url: width: 800 }}"
+      alt="{{ product.title }} – {{ color_value }}"
+      loading="lazy"
+    >
+  </div>
+
+{% endif %}
+
+
+
+
+
+{% for item in search.results %}
+
+  {% if item.object_type != 'product' %}
+    {% continue %}
+  {% endif %}
+
+  {% assign product = item %}
+
+  {%- assign color_option = nil -%}
+  {%- for option in product.options_with_values -%}
+    {%- if option.name | downcase contains 'color' -%}
+      {%- assign color_option = option -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if color_option == nil %}
+    {% continue %}
+  {% endif %}
+
+  {%- for color_value in color_option.values -%}
+
+    {%- assign color_variant = nil -%}
+    {%- for variant in product.variants -%}
+      {%- if variant.options contains color_value -%}
+        {%- assign color_variant = variant -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {% if color_variant == nil %}
+      {% continue %}
+    {% endif %}
+
+    {%- assign image = color_variant.featured_image | default: product.featured_image -%}
+
+    <div class="grid__item">
+      <a href="{{ color_variant.url }}" class="variant-card">
+
+        <img
+          src="{{ image | image_url: width: 600 }}"
+          alt="{{ product.title }} – {{ color_value }}"
+          loading="lazy"
+        >
+
+        <h3 class="variant-card__title">
+          {{ product.title }} – {{ color_value }}
+        </h3>
+
+        <span class="price">
+          {{ color_variant.price | money }}
+        </span>
+
+      </a>
+    </div>
+
+  {%- endfor -%}
+
+{% endfor %}
+
+
+
+
+
